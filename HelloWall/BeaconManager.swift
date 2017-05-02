@@ -41,6 +41,7 @@ class BeaconManager: NSObject, CLLocationManagerDelegate, UNUserNotificationCent
         }
         
         let uuid = UUID(uuidString: "61C16BAA-AB2D-4B54-829F-CC456704F319")! //iRot
+        //let uuid = UUID(uuidString: "FF896073-0D64-4EC9-8AE8-8E443C7DB8FB")! // iRotII
         //let uuid = UUID(uuidString: "6231F718-1494-47F5-809C-8E86C4360D76")! //peterBeacon
         //let uuid = UUID(uuidString: "824EDFBF-874E-4D14-A8B6-065D8730E867")! //mikko
         let beaconRegion = CLBeaconRegion(proximityUUID: uuid, identifier: "iRot")

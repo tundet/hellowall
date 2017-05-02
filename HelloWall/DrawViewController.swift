@@ -34,6 +34,8 @@ class DrawViewController: UIViewController, ColorPickerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //TODO get beacon uuid
+        
         //Disable effect for now
         blurEffect.isHidden = true
         
@@ -223,7 +225,7 @@ class DrawViewController: UIViewController, ColorPickerDelegate {
     
     
     @IBAction func uploadPost(_ sender: Any) {
-        if defaults.object(forKey:"yesterday") as! String  == today {
+        if defaults.object(forKey:"yesterday") as? String  == today {
             let alert = UIAlertController(title: "Sorry", message: "You can only post once a day to this wall", preferredStyle: UIAlertControllerStyle.alert)
             
             // add an action (button)

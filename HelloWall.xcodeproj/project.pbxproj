@@ -20,6 +20,7 @@
 		420FB7DA1EAD3EC400F98468 /* CustomPointAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 420FB7D91EAD3EC400F98468 /* CustomPointAnnotation.swift */; };
 		420FB7FE1EB09C1600F98468 /* BeaconManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 420FB7FD1EB09C1600F98468 /* BeaconManager.swift */; };
 		420FB8011EB7CD7500F98468 /* ApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 420FB8001EB7CD7500F98468 /* ApiService.swift */; };
+		420FB8031EB9046400F98468 /* HomeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 420FB8021EB9046400F98468 /* HomeCell.swift */; };
 		42AC3CED1E9A617300204834 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42AC3CEC1E9A617300204834 /* AppDelegate.swift */; };
 		42AC3CEF1E9A617300204834 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42AC3CEE1E9A617300204834 /* ProfileViewController.swift */; };
 		42AC3CF21E9A617300204834 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 42AC3CF01E9A617300204834 /* Main.storyboard */; };
@@ -64,6 +65,7 @@
 		420FB7D91EAD3EC400F98468 /* CustomPointAnnotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomPointAnnotation.swift; sourceTree = "<group>"; };
 		420FB7FD1EB09C1600F98468 /* BeaconManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeaconManager.swift; sourceTree = "<group>"; };
 		420FB8001EB7CD7500F98468 /* ApiService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApiService.swift; sourceTree = "<group>"; };
+		420FB8021EB9046400F98468 /* HomeCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeCell.swift; sourceTree = "<group>"; };
 		42AC3CE91E9A617300204834 /* HelloWall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HelloWall.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		42AC3CEC1E9A617300204834 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		42AC3CEE1E9A617300204834 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
@@ -126,6 +128,7 @@
 				420FB77F1EA1511300F98468 /* PostCell.swift */,
 				420FB7D11EAD045500F98468 /* OwnPostCell.swift */,
 				420FB7871EA26AAF00F98468 /* MenuBar.swift */,
+				420FB8021EB9046400F98468 /* HomeCell.swift */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -367,6 +370,7 @@
 				420FB7D21EAD045500F98468 /* OwnPostCell.swift in Sources */,
 				42AC3CF51E9A617300204834 /* HelloWall.xcdatamodeld in Sources */,
 				42AC3CED1E9A617300204834 /* AppDelegate.swift in Sources */,
+				420FB8031EB9046400F98468 /* HomeCell.swift in Sources */,
 				420FB8011EB7CD7500F98468 /* ApiService.swift in Sources */,
 				420FB77D1EA1491400F98468 /* MapViewController.swift in Sources */,
 				420FB7801EA1511300F98468 /* PostCell.swift in Sources */,
