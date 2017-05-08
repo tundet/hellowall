@@ -83,7 +83,7 @@
 		42AC3D0F1E9A617300204834 /* HelloWallUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelloWallUITests.swift; sourceTree = "<group>"; };
 		42AC3D111E9A617300204834 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		42AC3D1D1E9A645000204834 /* DrawViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DrawViewController.swift; sourceTree = "<group>"; };
-		42AC3D231E9B7D4A00204834 /* ColorPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ColorPicker.swift; path = ../ColorPicker.swift; sourceTree = "<group>"; };
+		42AC3D231E9B7D4A00204834 /* ColorPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ColorPicker.swift; path = /Users/tundet/Documents/xcode/HelloWall/HelloWall/ColorPicker.swift; sourceTree = "<absolute>"; };
 		42AC3DB51EA13A5A00204834 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
