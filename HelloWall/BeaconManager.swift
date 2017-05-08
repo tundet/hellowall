@@ -1,6 +1,11 @@
 //
 //  BeaconManager.swift
-//  HelloWall
+//  Model for the location manager BeaconManager.
+//  Creates a list of beacon regions and starts ranging for each of them.
+//  Informs the HomeViewController of changes when ranging for beacons and gives the current location's name.
+//  Notificating the user when entering beacon areaused to be in use when 
+//  there was only one beacon, but hasn't been updated for many beacons and 
+//  thus is not in use at the moment.
 //
 //  Created by Tünde Taba on 26.4.2017.
 //  Copyright © 2017 Tünde Taba. All rights reserved.
@@ -10,134 +15,153 @@ import UIKit
 import CoreLocation
 import UserNotifications
 
+// Protocol for giving location's name
+internal protocol BeaconManagerDelegate : NSObjectProtocol {
+    func BeaconChanged(sender: BeaconManager, title: String)
+}
+
 class BeaconManager: NSObject, CLLocationManagerDelegate, UNUserNotificationCenterDelegate{
     
     let locationManager: CLLocationManager!
+    var locations: [Location]?
+    var beacons: [Beacon]?
+    var beaconRegions: [CLBeaconRegion]?
+    var wallname: String?
+    var location_id: Int
+    weak var delegate: BeaconManagerDelegate?
     
-    override init() {
-        self.locationManager = CLLocationManager()
-    }
-    
+    // Singleton
+    static let sharedInstance = BeaconManager()
     private static var sharedNetworkManager: BeaconManager = {
         let beaconmanager = BeaconManager()
         
         return beaconmanager
     }()
-    
-    func startScanning(){
-        locationManager.delegate = self
-        locationManager.requestAlwaysAuthorization()
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        
-        let options: UNAuthorizationOptions = [.alert,.sound]
-        UNUserNotificationCenter.current().requestAuthorization(options: options) {
-            (granted, error) in
-            if !granted {
-                debugPrint("Something went wrong")
-            } else {
-                debugPrint("Notifications granted")
-                
-            }
-        }
-        
-        let uuid = UUID(uuidString: "61C16BAA-AB2D-4B54-829F-CC456704F319")! //iRot
-        //let uuid = UUID(uuidString: "FF896073-0D64-4EC9-8AE8-8E443C7DB8FB")! // iRotII
-        //let uuid = UUID(uuidString: "6231F718-1494-47F5-809C-8E86C4360D76")! //peterBeacon
-        //let uuid = UUID(uuidString: "824EDFBF-874E-4D14-A8B6-065D8730E867")! //mikko
-        let beaconRegion = CLBeaconRegion(proximityUUID: uuid, identifier: "iRot")
-        beaconRegion.notifyOnEntry = true
-        beaconRegion.notifyOnExit = false
-        beaconRegion.notifyEntryStateOnDisplay = false
-        
-        let content = UNMutableNotificationContent()
-        content.title = "Hello Wall"
-        content.body = "You have entered a Wall area"
-        
-        let trigger = UNLocationNotificationTrigger(region: beaconRegion, repeats: false)
-        
-        let identifier = "BeaconLocationIdentifier"
-        let request = UNNotificationRequest.init(identifier: identifier, content: content, trigger: trigger)
-        
-        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
-        
-        UNUserNotificationCenter.current().delegate = self
-        UNUserNotificationCenter.current().add(request, withCompletionHandler: { (error) in
-            
-        })
-        
-
-        DispatchQueue.main.async {
-            self.locationManager.startMonitoring(for: beaconRegion)
-            self.locationManager.startRangingBeacons(in: beaconRegion)
-            self.locationManager.startUpdatingLocation()
-        }
-        
-        
-    }
-    
     class func shared() -> BeaconManager {
         return sharedNetworkManager
     }
     
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        if status == .authorizedAlways {
-            if CLLocationManager.isMonitoringAvailable(for: CLBeaconRegion.self) {
-                if CLLocationManager.isRangingAvailable() {
-                    startScanning()
+    override init() {
+        self.locationManager = CLLocationManager()
+        self.location_id = 0
+    }
+    
+    // Setup for the location manager and notifications
+    func setupLocationManager(){
+        locationManager.delegate = self
+        locationManager.requestAlwaysAuthorization()
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        
+        //Check whether notifications are granted
+        let options: UNAuthorizationOptions = [.alert,.sound]
+        UNUserNotificationCenter.current().requestAuthorization(options: options) {
+            (granted, error) in
+            if !granted {
+                debugPrint("No notifications")
+            } else {
+                debugPrint("Notifications granted")
+            }
+        }
+        //UNUserNotificationCenter.current().delegate = self
+    }
+    
+    // Set up list of regions by fetching locations' beacons' UUID through ApiService
+    func fetchBeacons(){
+        ApiService.sharedInstance.fetchLocations{ (locations: [Location]) in
+            self.locations = locations
+            var regions = [CLBeaconRegion]()
+            for location in self.locations!{
+                for beacon in location.beacons!{
+                    let uuid = UUID(uuidString: beacon.uuid!)
+                    let region = CLBeaconRegion(proximityUUID: uuid!, identifier: location.name!)
+                    regions.append(region)
                 }
             }
+            
+            self.beaconRegions = regions
+            self.beaconRegions?.forEach(self.locationManager.startRangingBeacons)
+            self.locationManager.startUpdatingLocation()
         }
     }
     
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        // Called when the notification has been swiped or tapped by the user
-        
-        // Do something with the response here
-        
-        // Make sure you call the completion handler
-        completionHandler()
+    // Method for returning the current location's id
+    func getLocationId(uuid: String) -> Int{
+        let location_id = ApiService.sharedInstance.locationIdArray[uuid]
+        return location_id ?? 0
     }
     
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        // Called when the app is in the foreground
-        
-        // Do something with the notification here
-        
-        // Make sure you call the completion handler
-        completionHandler([.alert, .sound])
-    }
+        func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+            if status == .authorizedAlways {
+                if CLLocationManager.isMonitoringAvailable(for: CLBeaconRegion.self) {
+                    if CLLocationManager.isRangingAvailable() {
+                        fetchBeacons()
+                    }
+                }
+            }
+        }
     
+    // Ranging for beacons and informing HomeViewController about current location name.
     func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion) {
+        
         if beacons.count > 0 {
-            updateDistance(beacons[0].proximity)
+            if self.wallname == nil{
+                self.wallname = region.identifier
+                self.location_id = getLocationId(uuid: beacons[0].proximityUUID.uuidString)
+            }
+            self.delegate?.BeaconChanged(sender: self, title: self.wallname ?? "Home")
+            
         } else {
-            updateDistance(.unknown)        }
+            self.wallname = nil
+        }
     }
     
+    // Entering region
     func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
         debugPrint("Entered Region \(region.identifier)")
     }
     
+    // Leaving region
     func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
         debugPrint("Exited Region \(region.identifier)")
     }
     
-    func updateDistance(_ distance: CLProximity) {
-        UIView.animate(withDuration: 0.8) {
-            switch distance {
-            case .unknown:
-                print("disconnected")
-                
-            case .far:
-                print("far")
-                
-            case .near:
-                print("near")
-                
-            case .immediate:
-                print("close")
-            }
-        }
-    }
-
+    //    func setupTrigger(){
+    //        let content = UNMutableNotificationContent()
+    //        content.title = "Hello Wall"
+    //        content.body = "You have entered a Wall area"
+    //        let trigger = UNLocationNotificationTrigger(region: region, repeats: false)
+    //        let identifier = "BeaconLocationIdentifier"
+    //        let request = UNNotificationRequest.init(identifier: identifier, content: content, trigger: trigger)
+    //        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+    //        UNUserNotificationCenter.current().add(request, withCompletionHandler: { (error) in
+    //            })
+    //    }
+    
+    //    // When the notification has been swiped or tapped by the user
+    //    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+    //        completionHandler()
+    //    }
+    //
+    //    // When the app is in the foreground
+    //    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    //        completionHandler([.alert, .sound])
+    //    }
+    
+    //    func updateDistance(_ distance: CLProximity) {
+    //        UIView.animate(withDuration: 0.8) {
+    //            switch distance {
+    //            case .unknown:
+    //                print("unknown")
+    //            case .far:
+    //                print("far")
+    //
+    //            case .near:
+    //                print("near")
+    //                
+    //            case .immediate:
+    //                print("close")
+    //            }
+    //        }
+    //    }
+    
 }

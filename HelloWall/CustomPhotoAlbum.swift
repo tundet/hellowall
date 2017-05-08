@@ -1,6 +1,6 @@
 //
 //  Directory.swift
-//  HelloWall
+//  Creating a custom folder and saving images in it when needed.
 //
 //  Created by Tünde Taba on 23.4.2017.
 //  Copyright © 2017 Tünde Taba. All rights reserved.
@@ -9,21 +9,24 @@
 import Foundation
 import Photos
 
-
 class CustomPhotoAlbum: NSObject {
     static let albumName = "HelloWall"
     static let sharedInstance = CustomPhotoAlbum()
     
     var assetCollection: PHAssetCollection!
+    var photoasset = PHAsset()
+    var images:[UIImage]!
+    var titles:[String]!
     
     override init() {
         super.init()
         
+        // Setup assetCollection if it exists
         if let assetCollection = fetchAssetCollectionForAlbum() {
             self.assetCollection = assetCollection
             return
         }
-        
+        // Check authorization
         if PHPhotoLibrary.authorizationStatus() != PHAuthorizationStatus.authorized {
             PHPhotoLibrary.requestAuthorization({ (status: PHAuthorizationStatus) -> Void in
                 ()
@@ -37,19 +40,19 @@ class CustomPhotoAlbum: NSObject {
         }
     }
     
+    // Handling the authorization, to ensure the creation of the album.
     func requestAuthorizationHandler(status: PHAuthorizationStatus) {
         if PHPhotoLibrary.authorizationStatus() == PHAuthorizationStatus.authorized {
-            // ideally this ensures the creation of the photo album even if authorization wasn't prompted till after init was done
             print("trying again to create the album")
             self.createAlbum()
         } else {
-            print("should really prompt the user to let them know it's failed")
+            print("album creation failed")
         }
     }
-    
+    // Creating an asset collection with the album name
     func createAlbum() {
         PHPhotoLibrary.shared().performChanges({
-            PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: CustomPhotoAlbum.albumName)   // create an asset collection with the album name
+            PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: CustomPhotoAlbum.albumName)
         }) { success, error in
             if success {
                 self.assetCollection = self.fetchAssetCollectionForAlbum()
@@ -59,6 +62,7 @@ class CustomPhotoAlbum: NSObject {
         }
     }
     
+    // Getting the asset collection
     func fetchAssetCollectionForAlbum() -> PHAssetCollection? {
         let fetchOptions = PHFetchOptions()
         fetchOptions.predicate = NSPredicate(format: "title = %@", CustomPhotoAlbum.albumName)
@@ -70,9 +74,10 @@ class CustomPhotoAlbum: NSObject {
         return nil
     }
     
+    // Save image to custom folder but in case of error skip
     func save(image: UIImage) {
         if assetCollection == nil {
-            return                          // if there was an error upstream, skip the save
+            return
         }
         
         PHPhotoLibrary.shared().performChanges({
@@ -84,4 +89,5 @@ class CustomPhotoAlbum: NSObject {
             
         }, completionHandler: nil)
     }
+
 }

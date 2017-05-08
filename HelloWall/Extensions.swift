@@ -8,13 +8,14 @@
 
 import UIKit
 
+// Shorter version to skip the /255 part
 extension UIColor {
     static func rgb(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) -> UIColor {
         return UIColor(red: red/255, green: green/255, blue: blue/255, alpha: 1)
     }
 }
 
-//custom helper for constraints
+//Custom helper for constraints
 extension UIView {
     func addConstraints(withFormat format: String, views:UIView..., options: NSLayoutFormatOptions = NSLayoutFormatOptions())
     {
@@ -29,8 +30,10 @@ extension UIView {
     }
 }
 
+
 let imageCache = NSCache<AnyObject, AnyObject>()
 
+// For loading images from URL to an imageView and adding to cache
 class CustomImageView: UIImageView {
     
     var imageUrlString: String?
@@ -38,11 +41,7 @@ class CustomImageView: UIImageView {
     func loadImageUsingUrlString(urlString: String) {
         
         imageUrlString = urlString
-        
-        //let index = urlString.index(urlString.startIndex, offsetBy: 7)
-        //let urlShort = urlString.substring(from: index)
         let url = NSURL(string: urlString)
-        
         image = nil
         
         if let imageFromCache = imageCache.object(forKey: urlString as AnyObject) as? UIImage{
@@ -74,6 +73,7 @@ class CustomImageView: UIImageView {
     }
 }
 
+// For appending String to Data
 extension NSMutableData {
     func appendString(string: String) {
         let data = string.data(using: String.Encoding.utf8, allowLossyConversion: true)

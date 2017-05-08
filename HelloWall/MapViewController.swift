@@ -1,6 +1,6 @@
 //
 //  MapViewController.swift
-//  HelloWall
+//  Map with annotations for locations.
 //
 //  Created by Tünde Taba on 14.4.2017.
 //  Copyright © 2017 Tünde Taba. All rights reserved.
@@ -13,82 +13,51 @@ import CoreLocation
 class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDelegate {
     
     let locationManager = BeaconManager.shared()
+    var locations = [Location]()
     
     @IBOutlet weak var mapView: MKMapView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
         
         mapView.delegate = self
         mapView.showsUserLocation = true
-        
-        let koululocation:CLLocationCoordinate2D = CLLocationCoordinate2DMake(60.220835, 24.805561)
-        
-        let annotation = MKPointAnnotation()
-        
-        annotation.coordinate = koululocation
-        annotation.title = "Metropolia AMK"
-        mapView.addAnnotation(annotation)
-        
+    
         fetchLocations()
         
     }
     
+    // Get locations from API and add their annotations to map
     func fetchLocations(){
         
-        //let url = NSURL(string: "https://users.metropolia.fi/~tundet/web/home.json")
-        let url = NSURL(string: "https://irot-hello-wall.othnet.ga/locations")
-        URLSession.shared.dataTask(with: url! as URL){
-            (data, response, error) in
-            
-            if error != nil {
-                print(error as Any)
-                return
-            }
-            
-            do {
-                let json = try JSONSerialization.jsonObject(with: data!, options: .mutableContainers) as! [String: AnyObject]
-                if let jsondict = json["data"]{
-                    
-                    for dictionary in jsondict as! [[String: AnyObject]]{
-                        let annotation = CustomPointAnnotation()
-                        print(dictionary["name"] as! String)
-                        annotation.title = dictionary["name"] as? String
-                        annotation.subtitle = dictionary["description"] as? String
-                        let longitude = dictionary["longitude"] as? String
-                        let latitude = dictionary["latitude"] as? String
-                        let location:CLLocationCoordinate2D = CLLocationCoordinate2DMake(CLLocationDegrees(longitude!)!, CLLocationDegrees(latitude!)!)
-                        if let imgurl = NSURL(string: dictionary["style"]?["logo_url"] as! String){
-                            print(imgurl)
-                            let imgdata = NSData(contentsOf: imgurl as URL)
-                            annotation.logo = UIImage(data: imgdata as! Data)
-                        }
-                        annotation.coordinate = location
-                        self.mapView.addAnnotation(annotation)
-                        print("\(annotation.title) added")
-                    }
+        ApiService.sharedInstance.fetchLocations{ (locations: [Location]) in
+            self.locations = locations
+            for location in self.locations{
+                let annotation = CustomPointAnnotation()
+                annotation.title = location.name
+                annotation.subtitle = location.description
+                if let imgurl = location.logo_url{
+                    let imgdata = NSData(contentsOf: imgurl as URL)
+                    annotation.logo = UIImage(data: imgdata as! Data)
                 }
-                
-            } catch let jsonError {
-                print(jsonError)
+                annotation.coordinate = location.coordinates!
+                self.mapView.addAnnotation(annotation)
+                }
             }
-            
-            }.resume()
-    }
+        }
     
+    // Updating user's location
     func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
         
         let location = locations.last as! CLLocation
         let center = CLLocationCoordinate2D(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
-        var region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1))
+        var region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
         region.center = mapView.userLocation.coordinate
         mapView.setRegion(region, animated: true)
         
     }
     
-    //Custom annotation
+    //Custom annotation with image
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         // If annotation is not of type RestaurantAnnotation (MKUserLocation types for instance), return nil
         if !(annotation is CustomPointAnnotation){

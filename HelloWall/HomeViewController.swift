@@ -1,6 +1,9 @@
 //
 //  Home.swift
-//  HelloWall
+//  Main view with a collection view that has 3 cells for today's,
+//  yesterday's and the day before yesterday's posts according
+//  to current location. There is a menubar for switching between
+//  the 3 cells.
 //
 //  Created by Tünde Taba on 14.4.2017.
 //  Copyright © 2017 Tünde Taba. All rights reserved.
@@ -8,23 +11,43 @@
 
 import UIKit
 
-class HomeViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
+class HomeViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, BeaconManagerDelegate {
     
-    //var today: String?
     let cellId = "cellId"
-    let beaconmanager = BeaconManager.shared()
+    let yesterdayCellId = "yesterdayCellId"
+    let olderCellId = "olderCellId"
+    let homeCellId = "homeCellId"
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         navigationItem.title = "Home"
         navigationController?.navigationBar.isTranslucent = false
-        
+        self.automaticallyAdjustsScrollViewInsets = false;
+        tabBarController!.tabBar.items![1].isEnabled = false
         setupMenuBar()
         setupCollectionView()
-        beaconmanager.startScanning()
+        BeaconManager.sharedInstance.setupLocationManager()
+        BeaconManager.sharedInstance.fetchBeacons()
+        BeaconManager.sharedInstance.delegate = self
     }
     
+    // Change title when beacon changed and allow drawing
+    internal func BeaconChanged(sender: BeaconManager, title: String) {
+        navigationItem.title = title
+        collectionView?.reloadData()
+        
+//        let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
+//        loadingIndicator.hidesWhenStopped = true
+//        loadingIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.gray
+//        loadingIndicator.startAnimating();
+        
+        if navigationItem.title != "Home" {
+            tabBarController!.tabBar.items![1].isEnabled = true
+        }
+    }
+    
+    // Setup the cells in the collection view
     func setupCollectionView(){
         if let layout = collectionView?.collectionViewLayout as? UICollectionViewFlowLayout{
             layout.scrollDirection = .horizontal
@@ -32,30 +55,33 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
         }
         
         collectionView?.backgroundColor = UIColor.white
-        collectionView?.register(HomeCell.self, forCellWithReuseIdentifier: cellId)
+        collectionView?.register(UICollectionViewCell.self, forCellWithReuseIdentifier: cellId)
+        collectionView?.register(HomeCell.self, forCellWithReuseIdentifier: homeCellId)
+        collectionView?.register(YesterdayCell.self, forCellWithReuseIdentifier: yesterdayCellId)
+        collectionView?.register(OlderCell.self, forCellWithReuseIdentifier: olderCellId)
         
         //show view and scroll from under the menubar
         collectionView?.contentInset = UIEdgeInsetsMake(50, 0, 0, 0)
         collectionView?.scrollIndicatorInsets = UIEdgeInsetsMake(50, 0, 0, 0)
         
         collectionView?.isPagingEnabled = true
-        
     }
     
+    // Scroll to correct cell when menu item is tapped
     func scrollToMenuIndex(menuIndex: Int) {
         let indexPath = IndexPath(item: menuIndex, section: 0)
         collectionView?.scrollToItem(at: indexPath, at: UICollectionViewScrollPosition(), animated: true)
     }
     
+    // Create Menu bar
     lazy var menuBar: MenuBar = {
         let mb = MenuBar()
         mb.homeController = self    //reason why lazy var
         return mb
     }()
     
+    // Setup menu bar
     private func setupMenuBar() {
-        
-        navigationController?.hidesBarsOnSwipe = true
         
         view.addSubview(menuBar)
         view.addConstraints(withFormat: "H:|[v0]|", views: menuBar)
@@ -65,8 +91,6 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
         
     }
     
-    
-    
     //Menubar item's horizontal bar to match with view
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         menuBar.horizontalBarLeftAnchorConstraint?.constant = scrollView.contentOffset.x / 3
@@ -74,8 +98,6 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
     
     //Menubar item selected to match view
     override func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        
-        print(targetContentOffset.pointee.x / view.frame.width)
         
         let index = targetContentOffset.pointee.x / view.frame.width
         
@@ -88,7 +110,20 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
         return 3
     }
     
+    // Setup three cells in view and make them match with index
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+        if navigationItem.title != "Home" {
+            if indexPath.item == 1 {
+                return collectionView.dequeueReusableCell(withReuseIdentifier: yesterdayCellId, for: indexPath)
+            }else if indexPath.item == 2 {
+                return collectionView.dequeueReusableCell(withReuseIdentifier: olderCellId, for: indexPath)
+            }
+            
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: homeCellId, for: indexPath)
+            
+            return cell
+        }
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath)
         
@@ -96,9 +131,7 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: view.frame.width, height: view.frame.height - 50)
+        return CGSize(width: collectionView.frame.width, height: collectionView.frame.height - 50)
     }
-    
-    
     
 }

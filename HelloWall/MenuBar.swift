@@ -1,6 +1,6 @@
 //
 //  MenuBar.swift
-//  A menubar placed under the navigation bar.
+//  A menubar placed under the navigation bar with a custom cell.
 //  Navigates through the collection views.
 //
 //  Created by Tünde Taba on 15.4.2017.
@@ -11,6 +11,7 @@ import UIKit
 
 class MenuBar: UIView, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
+    // Setup menu
     lazy var menuView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -19,23 +20,22 @@ class MenuBar: UIView, UICollectionViewDataSource, UICollectionViewDelegate, UIC
         cv.delegate = self
         return cv
     }()
-    
+
     let cellId = "cellId"
-    let imageNames = ["home", "home", "home"]
+    let imageNames = ["today200", "yesterday200", "older200"]
     
     var homeController: HomeViewController?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        //custom cell
         menuView.register(MenuCell.self, forCellWithReuseIdentifier: cellId)
         
         addSubview(menuView)
         addConstraints(withFormat: "H:|[v0]|", views: menuView)
         addConstraints(withFormat: "V:|[v0]|", views: menuView)
         
-        //first menu item selected
+        // First menu item selected
         let selectedIndexPath = IndexPath(item: 0, section: 0)
         menuView.selectItem(at: selectedIndexPath, animated: false, scrollPosition: UICollectionViewScrollPosition())
         
@@ -45,10 +45,10 @@ class MenuBar: UIView, UICollectionViewDataSource, UICollectionViewDelegate, UIC
     
     var horizontalBarLeftAnchorConstraint: NSLayoutConstraint?
     
-    //Horizontal bar under icon
+    // Horizontal bar under icon
     func setupHorizontalBar(){
         let horizontalBarView = UIView()
-        horizontalBarView.backgroundColor = UIColor.blue
+        horizontalBarView.backgroundColor = UIColor.rgb(red: 99, green: 197, blue: 146, alpha: 1)
         horizontalBarView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(horizontalBarView)
         
@@ -60,16 +60,8 @@ class MenuBar: UIView, UICollectionViewDataSource, UICollectionViewDelegate, UIC
         
     }
     
-    //Animate horizontal bar to match with selected item
+    // Animate horizontal bar to match with selected item
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        print(indexPath.item)
-//        let x = CGFloat(indexPath.item) * frame.width / 3
-//        horizontalBarLeftAnchorConstraint?.constant = x
-//        
-//        UIView.animate(withDuration: 0.75, delay: 0, options: .curveEaseOut, animations: {
-//            self.layoutIfNeeded()
-//        }, completion: nil)
-        
         homeController?.scrollToMenuIndex(menuIndex: indexPath.item)
     }
     
@@ -81,9 +73,7 @@ class MenuBar: UIView, UICollectionViewDataSource, UICollectionViewDelegate, UIC
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! MenuCell
         
         cell.imageView.image = UIImage(named: imageNames[indexPath.item])?.withRenderingMode(.alwaysTemplate)
-        cell.tintColor = UIColor.rgb(red: 91, green: 14, blue: 13, alpha: 1)
-        
-        //cell.backgroundColor = UIColor.blue
+        cell.tintColor = UIColor.rgb(red: 99, green: 197, blue: 146, alpha: 1)
         
         return cell
     }
@@ -106,20 +96,20 @@ class MenuCell: BaseCell {
     
     let imageView: UIImageView = {
         let iv = UIImageView()
-        iv.image = UIImage(named: "home")?.withRenderingMode(.alwaysTemplate)
-        iv.tintColor = UIColor.gray
+        iv.image = UIImage(named: "today200")?.withRenderingMode(.alwaysTemplate)
+        iv.tintColor = UIColor.lightGray
         return iv
     }()
     
     override var isHighlighted: Bool {
         didSet{
-            imageView.tintColor = isHighlighted ? UIColor.blue : UIColor.lightGray
+            imageView.tintColor = isHighlighted ? UIColor.rgb(red: 99, green: 197, blue: 146, alpha: 1) : UIColor.lightGray
         }
     }
     
     override var isSelected: Bool {
         didSet{
-            imageView.tintColor = isSelected ? UIColor.blue : UIColor.lightGray
+            imageView.tintColor = isSelected ? UIColor.rgb(red: 99, green: 197, blue: 146, alpha: 1) : UIColor.lightGray
         }
     }
 
@@ -127,8 +117,8 @@ class MenuCell: BaseCell {
         super.setupViews()
         
         addSubview(imageView)
-        addConstraints(withFormat: "H:[v0(28)]", views: imageView)
-        addConstraints(withFormat: "V:[v0(28)]", views: imageView)
+        addConstraints(withFormat: "H:[v0(80)]", views: imageView)
+        addConstraints(withFormat: "V:[v0(50)]", views: imageView)
         
         addConstraint(NSLayoutConstraint(item: imageView, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0))
         addConstraint(NSLayoutConstraint(item: imageView, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1, constant: 0))

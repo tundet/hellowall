@@ -1,6 +1,7 @@
 //
 //  PostCell.swift
-//  HelloWall
+//  Model for collectionView's BaseCell, which is each cell's base.
+//  Model for PostCell, which is base for a post's cell.
 //
 //  Created by Tünde Taba on 14.4.2017.
 //  Copyright © 2017 Tünde Taba. All rights reserved.
@@ -32,31 +33,26 @@ class PostCell: BaseCell {
         }
     }
     
-    
-    //let screenSize = UIScreen.main.bounds
-    
+    // Setup cell's image by loading it from post's imageUrl.
     func setupThumbnailImage() {
-        if let thumbnailImageUrl = post?.thumbnailImageName {
+        if let thumbnailImageUrl = post?.imageUrl {
             
             thumbnailImageView.loadImageUsingUrlString(urlString: thumbnailImageUrl)
         }
     }
     
+    // Setup CustomImageView
     let thumbnailImageView: CustomImageView = {
         let imageView = CustomImageView()
-        imageView.backgroundColor = UIColor.blue
-        imageView.image = UIImage(named: "IMG_0043")
-        //imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.backgroundColor = UIColor.white
         return imageView
     }()
     
+    // Add CustomImageView to view without padding.
     override func setupViews() {
         addSubview(thumbnailImageView)
         
         addConstraints(withFormat: "H:|[v0]|", views: thumbnailImageView)
         addConstraints(withFormat: "V:|[v0]|", views: thumbnailImageView)
-    
-        
-        //thumbnailImageView.frame = CGRect(x: 0, y: 0, width: screenSize.width / 3, height: screenSize.width * 0.5)
     }
 }

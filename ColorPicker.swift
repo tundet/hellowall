@@ -1,6 +1,7 @@
 //
 //  ColorPicker.swift
-//  HelloWall
+//  UIView that shows a variety of colors to pick from and gives
+//  the picked color to DrawViewController.
 //
 //  Created by Tünde Taba on 10.4.2017.
 //  Copyright © 2017 Tünde Taba. All rights reserved.
@@ -8,8 +9,9 @@
 
 import UIKit
 
+// Giving selected UIColor of brush to DrawViewController
 internal protocol ColorPickerDelegate : NSObjectProtocol {
-    func ColorPickerTouched(sender:ColorPicker, color:UIColor, point:CGPoint, state:UIGestureRecognizerState)
+    func ColorPickerTouched(sender:ColorPicker, color:UIColor)
 }
 
 
@@ -18,18 +20,18 @@ class ColorPicker: UIView {
 
     var delegate: ColorPickerDelegate?
     
-    let saturationExponentTop:Float = 2.0
-    let saturationExponentBottom:Float = 1.3
+    //setting up saturation
+    let saturationExponentTop:Float = 1.0
+    let saturationExponentBottom:Float = 1.0
     
-    @IBInspectable var elementSize: CGFloat = 10.0 {
+    //setting up size of colors (the bigger the less colors to choose from)
+    @IBInspectable var elementSize: CGFloat = 12.0 {
         didSet {
             setNeedsDisplay()
         }
     }
     
-    
     private func initialize() {
-        
         self.clipsToBounds = true
         let touchGesture = UILongPressGestureRecognizer(target: self, action: #selector(self.touchedColor(gestureRecognizer:)))
         touchGesture.minimumPressDuration = 0
@@ -37,19 +39,19 @@ class ColorPicker: UIView {
         self.addGestureRecognizer(touchGesture)
     }
     
+    // Setting up frame
     override init(frame: CGRect) {
         super.init(frame: frame)
-        //print("ColorPicker init")
         initialize()
     }
     
+    // Setting up encoder
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        //print("ColorPicker required init")
-
         initialize()
     }
     
+    // Drawing the colors
     override func draw(_ rect: CGRect) {
         let context = UIGraphicsGetCurrentContext()
         
@@ -68,6 +70,7 @@ class ColorPicker: UIView {
         }
     }
     
+    // Get UIColor according to point
     func getColorAtPoint(point:CGPoint) -> UIColor {
         let roundedPoint = CGPoint(x:elementSize * CGFloat(Int(point.x / elementSize)),
                                    y:elementSize * CGFloat(Int(point.y / elementSize)))
@@ -79,34 +82,12 @@ class ColorPicker: UIView {
         return UIColor(hue: hue, saturation: saturation, brightness: brightness, alpha: 1.0)
     }
     
-    func getPointForColor(color:UIColor) -> CGPoint {
-        var hue:CGFloat=0;
-        var saturation:CGFloat=0;
-        var brightness:CGFloat=0;
-        color.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: nil);
-        
-        var yPos:CGFloat = 0
-        let halfHeight = (self.bounds.height / 2)
-        
-        if (brightness >= 0.99) {
-            let percentageY = powf(Float(saturation), 1.0 / saturationExponentTop)
-            yPos = CGFloat(percentageY) * halfHeight
-        } else {
-            //use brightness to get Y
-            yPos = halfHeight + halfHeight * (1.0 - brightness)
-        }
-        
-        let xPos = hue * self.bounds.width
-        
-        return CGPoint(x: xPos, y: yPos)
-    }
-    
+    // Recognize gesture and give delegate the selected color
     func touchedColor(gestureRecognizer: UILongPressGestureRecognizer){
         let point = gestureRecognizer.location(in: self)
         let color = getColorAtPoint(point: point)
-        //debugPrint(color)
         
-        self.delegate?.ColorPickerTouched(sender: self, color: color, point: point, state:gestureRecognizer.state)
+        self.delegate?.ColorPickerTouched(sender: self, color: color)
     }
     
 }

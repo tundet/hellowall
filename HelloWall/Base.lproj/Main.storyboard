@@ -34,8 +34,8 @@
         <scene sceneID="2Ms-g8-jt2">
             <objects>
                 <collectionViewController title="Profile" id="ylU-xS-tZT" customClass="ProfileViewController" customModule="HelloWall" customModuleProvider="target" sceneMemberID="viewController">
-                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="pry-8h-1k7">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" dataMode="prototypes" id="pry-8h-1k7">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="618"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
@@ -91,8 +91,8 @@
         <scene sceneID="NOP-Kt-V6G">
             <objects>
                 <collectionViewController title="Home" id="Kl4-vU-DB2" customClass="HomeViewController" customModule="HelloWall" customModuleProvider="target" sceneMemberID="viewController">
-                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" pagingEnabled="YES" dataMode="prototypes" id="0eV-5f-Xba">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" pagingEnabled="YES" dataMode="prototypes" id="0eV-5f-Xba">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="618"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="4EP-pQ-93q">
@@ -119,7 +119,7 @@
                     <navigationItem key="navigationItem" title="Posts" id="2DQ-dw-nIS">
                         <barButtonItem key="rightBarButtonItem" systemItem="search" id="LYK-ed-UrO">
                             <connections>
-                                <segue destination="ZjW-dP-8hn" kind="show" id="TPw-ih-tdX"/>
+                                <segue destination="ZjW-dP-8hn" kind="show" identifier="gosearch" id="TPw-ih-tdX"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -137,11 +137,11 @@
                         <viewControllerLayoutGuide type="bottom" id="UGq-pj-2iS"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="8k8-xo-kkh">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="618"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="A7N-4c-2MX">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="618"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             </mapView>
                         </subviews>
@@ -231,7 +231,7 @@
                                                 <segue destination="Bbc-D7-zuQ" kind="show" identifier="gohome" id="V1L-C1-Rc4"/>
                                             </connections>
                                         </barButtonItem>
-                                        <barButtonItem key="rightBarButtonItem" title="Done" id="nrd-83-cuF">
+                                        <barButtonItem key="rightBarButtonItem" title="Post" id="nrd-83-cuF">
                                             <connections>
                                                 <action selector="uploadPost:" destination="b3P-Yk-TTV" id="Wgu-Ie-GBf"/>
                                             </connections>
@@ -303,11 +303,11 @@
                 <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="Bbc-D7-zuQ" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="IVE-AU-nWA"/>
-                    <tabBar key="tabBar" contentMode="scaleToFill" id="Jj0-ZO-mNF">
-                        <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
+                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
+                    <tabBar key="tabBar" contentMode="scaleToFill" translucent="NO" id="Jj0-ZO-mNF">
+                        <rect key="frame" x="0.0" y="0.0" width="1000" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                        <color key="tintColor" red="0.0" green="0.0" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                     </tabBar>
                     <connections>
                         <segue destination="QUb-MH-Z9l" kind="relationship" relationship="viewControllers" id="tX0-5B-BSH"/>
@@ -326,7 +326,7 @@
         <image name="profile" width="40" height="40"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="V1L-C1-Rc4"/>
+        <segue reference="T5j-fF-Sof"/>
     </inferredMetricsTieBreakers>
     <color key="tintColor" red="1" green="0.0" blue="1" alpha="1" colorSpace="calibratedRGB"/>
 </document>

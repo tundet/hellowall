@@ -1,12 +1,11 @@
 //
 //  ViewController.swift
-//  HelloWall
+//  Profile for viewing own posts fetched from custom folder.
+//  Custom folder exists but currently getting fixed posts as test.
 //
 //  Created by Tünde Taba on 23.4.2017.
 //  Copyright © 2017 Tünde Taba. All rights reserved.
 //
-
-import UIKit
 
 import UIKit
 
@@ -15,37 +14,35 @@ class ProfileViewController: UICollectionViewController, UICollectionViewDelegat
     var posts: [Post] = {
      var testPost = Post()
      testPost.id = 1
-     testPost.thumbnailImageName = "IMG_0043"
+     testPost.imageUrl = "IMG_0043"
      
      var catPost = Post()
      catPost.id = 2
-     catPost.thumbnailImageName = "IMG_0033"
+     catPost.imageUrl = "IMG_0033"
      
      var pepePost = Post()
      pepePost.id = 3
-     pepePost.thumbnailImageName = "IMG_0046"
+     pepePost.imageUrl = "IMG_0046"
      
      var saltPost = Post()
      saltPost.id = 4
-     saltPost.thumbnailImageName = "IMG_0048"
+     saltPost.imageUrl = "IMG_0048"
      
      var testPost2 = Post()
      testPost2.id = 5
-     testPost2.thumbnailImageName = "IMG_0049"
+     testPost2.imageUrl = "IMG_0049"
      
      var kanatoPost = Post()
      kanatoPost.id = 6
-     kanatoPost.thumbnailImageName = "IMG_0051"
+     kanatoPost.imageUrl = "IMG_0051"
      
      return [testPost, catPost, pepePost, saltPost, testPost2, kanatoPost]
      }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
         
         collectionView?.register(OwnPostCell.self, forCellWithReuseIdentifier: "cellId")
-        print("didload")
         
     }
     
@@ -55,7 +52,9 @@ class ProfileViewController: UICollectionViewController, UICollectionViewDelegat
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cellId", for: indexPath)
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cellId", for: indexPath) as! OwnPostCell
+        
+        cell.post = posts[indexPath.item]
         
         return cell
     }

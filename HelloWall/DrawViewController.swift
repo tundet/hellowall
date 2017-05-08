@@ -1,7 +1,8 @@
 //
 //  DrawViewController.swift
-//  HelloWall
-//  REROREROREROREROERO
+//  View for drawing something and changing brush settings.
+//  After drawing is done user can save it in a custom folder and post it
+//  to current location's wall.
 //
 //  Created by Tünde Taba on 9.4.2017.
 //  Copyright © 2017 Tünde Taba. All rights reserved.
@@ -14,7 +15,7 @@ class DrawViewController: UIViewController, ColorPickerDelegate {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var blurEffect: UIVisualEffectView!
     @IBOutlet weak var showColor: UIView!
-    @IBOutlet var colorView: UIView!
+    @IBOutlet weak var colorView: UIView!
     @IBOutlet weak var colorPicker: ColorPicker!
     @IBOutlet weak var sizeSlider: UISlider!
     @IBOutlet weak var imageViewBrush: UIImageView!
@@ -23,8 +24,6 @@ class DrawViewController: UIViewController, ColorPickerDelegate {
     var swiped = false
     var brushcolor = UIColor(red: 0, green: 0, blue: 0, alpha: 1.0)
     var brushsize: CGFloat = 10.0
-    var brushcount = 0
-    var pickercount = 0
     var pickershow = false
     var today: String?
     let defaults = UserDefaults.standard
@@ -33,8 +32,6 @@ class DrawViewController: UIViewController, ColorPickerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        //TODO get beacon uuid
         
         //Disable effect for now
         blurEffect.isHidden = true
@@ -45,25 +42,22 @@ class DrawViewController: UIViewController, ColorPickerDelegate {
         colorPicker.delegate = self
         drawPreview()   //draw the brush preview
         
-        defaults.set("2017-03-21", forKey: "yesterday")
+        defaults.set("2017-03-21", forKey: "yesterday")     //For testing
         setDate()
         
         self.tabBarController?.tabBar.isHidden = true   //don't show tab bar for navigation in this scene
         
-        
     }
     
-    internal func ColorPickerTouched(sender: ColorPicker, color: UIColor, point: CGPoint, state:
-        
-        UIGestureRecognizerState) {
+    // Update brush color according to color picked in ColorPicker
+    internal func ColorPickerTouched(sender: ColorPicker, color: UIColor) {
         if pickershow == true {
             self.brushcolor = color
             drawPreview()
-            pickercount += 1
-            //print("color count: \(pickercount)")
         }
     }
     
+    // Touching started. Save point if ColorPicker is not open.
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if pickershow == false {
             swiped = false
@@ -74,9 +68,8 @@ class DrawViewController: UIViewController, ColorPickerDelegate {
         }
     }
     
+    // Method for drawing line on image view, if ColorPicker is not open.
     func drawLines(fromPoint: CGPoint, toPoint: CGPoint){
-        
-        if pickershow == false{
             UIGraphicsBeginImageContext(self.imageView.frame.size)
             imageView.image?.draw(in: CGRect(x: 0, y: 0, width: self.imageView.frame.width, height: self.imageView.frame.height))
             let context = UIGraphicsGetCurrentContext()
@@ -92,15 +85,9 @@ class DrawViewController: UIViewController, ColorPickerDelegate {
             
             imageView.image = UIGraphicsGetImageFromCurrentImageContext()
             UIGraphicsEndImageContext()
-            
-            
-            
-            brushcount += 1
-            //print("brush count: \(brushcount)")
-        }
-        
     }
     
+    // Draw the line from first touch to current
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         if pickershow == false {
             swiped = true
@@ -113,6 +100,7 @@ class DrawViewController: UIViewController, ColorPickerDelegate {
         }
     }
     
+    // For drawing a "dot" if ColorPicker is not open
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?){
         if pickershow == false{
             if !swiped {
@@ -122,11 +110,11 @@ class DrawViewController: UIViewController, ColorPickerDelegate {
         
     }
     
+    // Save the current image view to custom folder
     func saveImage() {
         if imageView.image != nil{
             let imageData = UIImageJPEGRepresentation(imageView.image!, 1)
             let compressedJPGImage = UIImage(data: imageData!)
-            //UIImageWriteToSavedPhotosAlbum(compressedJPGImage!, nil, nil, nil)
             CustomPhotoAlbum.sharedInstance.save(image: compressedJPGImage!)
             
             // create the alert
@@ -141,9 +129,12 @@ class DrawViewController: UIViewController, ColorPickerDelegate {
         
     }
     
+    // Save image button
     @IBAction func saveImage(_ sender: Any) {
         saveImage()
     }
+    
+    // Reset canvas button
     @IBAction func resetImage(_ sender: Any) {
         let alert = UIAlertController(title: "Reset", message: "Are you sure you want to start over?", preferredStyle: UIAlertControllerStyle.alert)
         
@@ -155,9 +146,13 @@ class DrawViewController: UIViewController, ColorPickerDelegate {
         self.present(alert, animated: true, completion: nil)
         //imageView.image = nil
     }
+    
+    // Open ColorPicker button
     @IBAction func setBrush(_ sender: Any) {
         animateIn()
     }
+    
+    // Selected color button
     @IBAction func setColor(_ sender: Any) {
         animateOut()
     }
@@ -223,7 +218,7 @@ class DrawViewController: UIViewController, ColorPickerDelegate {
         UIGraphicsEndImageContext()
     }
     
-    
+    // Upload post button, only once a day is allowed.
     @IBAction func uploadPost(_ sender: Any) {
         if defaults.object(forKey:"yesterday") as? String  == today {
             let alert = UIAlertController(title: "Sorry", message: "You can only post once a day to this wall", preferredStyle: UIAlertControllerStyle.alert)
@@ -249,18 +244,20 @@ class DrawViewController: UIViewController, ColorPickerDelegate {
         }
     }
     
+    // Post method to current location and save date
     func postImageRequest(){
+        let id = BeaconManager.sharedInstance.location_id
         var request  = URLRequest(url: URL(string: "https://irot-hello-wall.othnet.ga/posts")!)
         request.httpMethod = "POST"
         
         let param = [
-            "location_id" : 1
+            "location_id" : id
         ]
         
         let boundary = "Boundary-\(UUID().uuidString)"
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         
-        let imageData = UIImageJPEGRepresentation(imageView.image!, 0.5)
+        let imageData = UIImageJPEGRepresentation(imageView.image!, 0.7)
         
         if(imageData == nil){
             return;
@@ -289,6 +286,7 @@ class DrawViewController: UIViewController, ColorPickerDelegate {
         self.present(alert, animated: true, completion: nil)
     }
     
+    // Create body that is posted to API
     func createBody(parameters: [String: Any]?, filePathKey: String?, imageDataKey: NSData, boundary: String) -> NSData {
         let body = NSMutableData();
         if parameters != nil {
@@ -310,8 +308,8 @@ class DrawViewController: UIViewController, ColorPickerDelegate {
         return body
     }
     
+    // Set up current date in right format
     func setDate(){
-        //set date
         let date = Date()
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
@@ -320,7 +318,6 @@ class DrawViewController: UIViewController, ColorPickerDelegate {
         if defaults.object(forKey: "yesterday") == nil {
             defaults.set("2017-03-21", forKey: "yesterday")
         }
-        print(defaults.object(forKey: "yesterday") as! String)
         
     }
     
@@ -328,7 +325,6 @@ class DrawViewController: UIViewController, ColorPickerDelegate {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
     
     /*
      // MARK: - Navigation
